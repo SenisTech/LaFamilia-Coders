@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="bg"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<title>Транспорт България</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+:root{--bg:#fff;--fg:#14181f;--mut:#6b7380;--line:#e3e6ea;--acc:#1a73e8;--card:#f3f5f8}
+body.dark{--bg:#161a20;--fg:#eef1f5;--mut:#9aa3b0;--line:#2b323c;--acc:#6ea8ff;--card:#202630}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;font:16px/1.35 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg)}
+#map{position:fixed;inset:0}
+#top{position:fixed;z-index:1000;left:10px;right:10px;top:calc(env(safe-area-inset-top) + 10px);display:flex;gap:8px}
+#top input,#top select,.btn{height:46px;border-radius:23px;border:0;background:var(--bg);color:var(--fg);font-size:16px;box-shadow:0 2px 10px #0004}
+#q{flex:1;min-width:0;padding:0 16px}#city{max-width:42%;padding:0 12px}
+#fabs{position:fixed;z-index:1000;right:10px;bottom:calc(var(--sh,150px) + 12px);display:flex;flex-direction:column;gap:10px;transition:bottom .2s}
+.btn{width:46px;padding:0;cursor:pointer;font-size:20px}.btn.on{background:var(--acc);color:#fff}
+#sheet{position:fixed;z-index:1001;left:0;right:0;bottom:0;height:var(--sh,150px);max-height:85dvh;background:var(--bg);border-radius:18px 18px 0 0;
+ box-shadow:0 -4px 16px #0003;display:flex;flex-direction:column;transition:height .2s;padding-bottom:env(safe-area-inset-bottom)}
+#grab{padding:10px;cursor:pointer}#grab i{display:block;width:40px;height:5px;border-radius:3px;background:var(--line);margin:auto}
+#tabs{display:flex;gap:6px;padding:0 12px 8px}
+#tabs button{flex:1;height:38px;border:0;border-radius:19px;background:var(--card);color:var(--fg);font-size:15px}
+#tabs button.on{background:var(--acc);color:#fff}
+#body{flex:1;overflow:auto;padding:0 12px 12px;-webkit-overflow-scrolling:touch}
+.row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.b{min-width:42px;text-align:center;color:#fff;border-radius:6px;padding:2px 6px;font-weight:700}
+.mut{color:var(--mut);font-size:13px}
+.card{background:var(--card);border-radius:12px;padding:10px;margin:8px 0}
+.go{width:100%;height:44px;margin:4px 0;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:16px;padding:0 8px}
+.go{background:var(--acc);color:#fff;border:0;font-weight:600}.go.sec{background:var(--card);color:var(--fg)}
+.veh{color:#fff;font:700 11px system-ui;border-radius:10px;padding:2px 5px;border:2px solid #fff;text-align:center;box-shadow:0 1px 4px #0006}
+.me{width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 2px #1a73e855}
+.leaflet-control-attribution{font-size:10px}
+.pr{margin-left:auto;white-space:nowrap;font-size:13px}.row>span:nth-child(2){flex:1;min-width:0}
+select.f,input.f{width:100%;height:44px;margin:4px 0;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:16px;padding:0 8px}
+details.src{margin:8px 0;font-size:13px}details.src summary{cursor:pointer;color:var(--mut)}details.src a{color:var(--acc)}details.src>div{padding:4px 0 2px}
+.dep{padding:5px 0;border-bottom:1px solid var(--line)}.chips span{display:inline-block;background:var(--card);border-radius:8px;padding:3px 7px;margin:2px;font-size:13px}
+.pin{width:28px;height:28px;border-radius:50%;background:#1a73e8;color:#fff;font:700 14px/22px system-ui;text-align:center;border:3px solid #fff;box-shadow:0 1px 6px #0006}.pin.b{background:#d93025}
+.opt{cursor:pointer;border:2px solid transparent}.opt.sel{border-color:var(--acc)}.lg{margin:6px 0}.hd{font-size:17px;margin-bottom:4px}
+#map.pick{cursor:crosshair}.dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.95) saturate(.7)}
+body.dark{color-scheme:dark}
+.leaflet-container{background:var(--card)}
+.leaflet-tooltip{background:var(--bg);color:var(--fg);border-color:var(--line)}
+.go:disabled{opacity:.45}
+#pay{position:fixed;inset:0;z-index:3000;background:#0008;display:none;align-items:flex-end;justify-content:center}
+#pay.show{display:flex}
+#payBox{background:var(--bg);color:var(--fg);width:100%;max-width:520px;max-height:92dvh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px calc(env(safe-area-inset-bottom) + 14px)}
+.demo{background:#f29900;color:#000;font:700 11px system-ui;border-radius:6px;padding:2px 7px;display:inline-block;vertical-align:middle}
+.li{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.pm{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;margin:6px 0;cursor:pointer}.pm.sel{border-color:var(--acc)}
+.qr{width:120px;height:120px;flex:none;background:#fff;padding:6px;border-radius:8px}.qr svg{width:100%;height:100%;display:block}
+.tk.old .qr{opacity:.3}.tk.old{opacity:.7}
+.spin{width:44px;height:44px;border-radius:50%;border:5px solid var(--line);border-top-color:var(--acc);margin:24px auto;animation:sp 0.9s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.big{font-size:44px;text-align:center}
+#bMenu{width:auto;padding:0 14px;font-size:15px;white-space:nowrap}#city{max-width:38%}
+#menu{position:fixed;z-index:1002;left:10px;top:calc(env(safe-area-inset-top) + 64px);min-width:240px;max-width:calc(100vw - 20px);background:var(--bg);border-radius:14px;box-shadow:0 6px 24px #0006;padding:6px;display:flex;flex-direction:column}
+#menu[hidden]{display:none}
+.mi{display:flex;justify-content:space-between;align-items:center;gap:14px;min-height:46px;padding:0 14px;border:0;background:none;color:var(--fg);font-size:16px;text-align:left;border-radius:10px;cursor:pointer}
+.mi:hover,.mi:active{background:var(--card)}.mi.on::after{content:'✓';color:var(--acc);font-weight:700}
+#head{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}#grab{padding:14px 10px 12px}#body{overscroll-behavior:contain}
+a.mi{text-decoration:none}
+</style></head><body>
+<div id="map"></div>
+<div id="top"><button class="btn" id="bMenu" aria-haspopup="true">☰ <span id="bMenuT"></span></button><input id="q" type="search" enterkeyhint="search"><select id="city"></select></div>
+<div id="menu" hidden>
+ <button class="mi" id="bTheme"></button><button class="mi" id="bSat"></button><button class="mi" id="bLive"></button>
+ <button class="mi" id="bAll"></button><button class="mi" id="bPick"></button><a class="mi" id="bHome" href="/"></a>
+</div>
+<div id="fabs"><button class="btn" id="bLoc">📍</button></div>
+<div id="sheet"><div id="head"><div id="grab"><i></i></div>
+ <div id="tabs"><button data-t="lines" class="on"></button><button data-t="route"></button><button data-t="tickets"></button></div></div>
+ <div id="body"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<div id="pay"><div id="payBox"></div></div>
+<script src="planner.js"></script>
+<script src="payments.js"></script>
+<script>
+const I18={bg:{lines:'Линии',route:'Мой маршрут',search:'Търси линия (напр. 76)',nodata:'Няма налични данни',live0:'Няма данни на живо тук',
+ live:'На живо',ago:'преди',s:'с',veh:'превозни ср.',light:'Светла',dark:'Тъмна',sat:'Сателит',addleg:'Добави отсечка',city:'Град / мрежа',line:'Линия',
+ dir:'Посока',from:'Качване',to:'Слизане',add:'Добави',clear:'Изчисти',walk:'пеша',auto:'Автоматичен маршрут между градове – скоро',empty:'Още няма отсечки.',
+ noloc:'Няма достъп до местоположение',to_:'към',noresult:'Няма резултати',rt:'Влак/линия',
+ price:'Цена',noinfo:'няма информация',perride:'на пътуване',source:'Източник',times:'Разписание',valid:'валидно',expired:'изтекъл',
+ weekly:'Седмичен график; празниците не са отчетени.',notimes:'Няма информация за разписание',next:'Следващи тръгвания',stop:'Спирка',
+ alltoday:'Всички тръгвания днес',back:'← Назад',arrives:'пристига',in_:'след',min:'мин',at:'в',nomore:'Няма повече тръгвания днес',
+ pick:'Избор на карта',clickA:'Кликни на картата за начало',clickB:'Кликни на картата за край',depart:'Тръгване',now:'Сега',
+ searching:'Търсене…',noroutes:'Няма намерени маршрути',change:'прекачване',changes:'прекачвания',direct:'директно',total:'Общо',
+ manual:'Ръчен маршрут',near:'близо до',nosched:'няма разписание – не се ползва при търсене',noprice:'без цена',from_:'от',notes:'Бележки'},
+ en:{lines:'Lines',route:'My route',search:'Search line (e.g. 76)',nodata:'No data available',live0:'No live data here',
+ live:'Live',ago:'',s:'s ago',veh:'vehicles',light:'Light',dark:'Dark',sat:'Satellite',addleg:'Add leg',city:'City / network',line:'Line',
+ dir:'Direction',from:'Board at',to:'Get off at',add:'Add',clear:'Clear',walk:'walk',auto:'Auto route between cities – coming soon',empty:'No legs yet.',
+ noloc:'Location unavailable',to_:'to',noresult:'No results',rt:'Train/line',
+ price:'Price',noinfo:'no info',perride:'per ride',source:'Source',times:'Timetable',valid:'valid',expired:'expired',
+ weekly:'Regular weekly pattern; holidays not applied.',notimes:'No timetable info',next:'Next departures',stop:'Stop',
+ alltoday:'All departures today',back:'← Back',arrives:'arrives',in_:'in',min:'min',at:'at',nomore:'No more departures today',
+ pick:'Pick on map',clickA:'Click the map to set the start',clickB:'Click the map to set the end',depart:'Depart',now:'Now',
+ searching:'Searching…',noroutes:'No routes found',change:'change',changes:'changes',direct:'direct',total:'Total',
+ manual:'Manual route',near:'near',nosched:'no timetable data – not used for routing',noprice:'no price',from_:'from',notes:'Notes'}};
+Object.assign(I18.bg,{tickets:'Билети',buy:'Купи билет',checkout:'Плащане',demoBanner:'Демо режим – нищо не се тегли реално. Само за концепция.',mCard:'Карта',mPay:'Apple Pay / Google Pay',mWallet:'Портфейл',
+ topup:'Добави €10 (демо)',cardNo:'Номер на карта',holder:'Име на картодържателя',payBtn:'Плати',cancel:'Отказ',processing:'Обработка на плащането…',paidOk:'Плащането е успешно',declinedMsg:'Картата е отказана',
+ tryAgain:'Опитай пак',done:'Готово',myTickets:'Моите билети',noTickets:'Още няма билети.',clearTickets:'Изчисти демо билетите',validUntil:'до',expiredT:'изтекъл',validT:'валиден',
+ unpricedNote:'Без цена в приложението (купува се от превозвача)',insufficient:'Недостатъчна наличност в портфейла',badCard:'Невалидни данни за карта',testHint:'Тест: 4242 4242 4242 4242 = успех · 4000 0000 0000 0002 = отказ',
+ capApplied:'приложен дневен таван',between:'Между градове',fromCity:'От град',toCity:'До град',findRoute:'Намери маршрут',autoNote:'Автоматичен маршрут между градове',
+ interNote:'Междуградските връзки идват само от данните на БДЖ; междуградски автобуси не са включени.',rides:'пътув.',ticket:'билет',sameCity:'Избери два различни града'});
+Object.assign(I18.en,{tickets:'Tickets',buy:'Buy ticket',checkout:'Checkout',demoBanner:'Demo mode – nothing is really charged. Concept only.',mCard:'Card',mPay:'Apple Pay / Google Pay',mWallet:'Wallet',
+ topup:'Add €10 (demo)',cardNo:'Card number',holder:'Name on card',payBtn:'Pay',cancel:'Cancel',processing:'Processing payment…',paidOk:'Payment successful',declinedMsg:'Card declined',
+ tryAgain:'Try again',done:'Done',myTickets:'My tickets',noTickets:'No tickets yet.',clearTickets:'Clear demo tickets',validUntil:'until',expiredT:'expired',validT:'valid',
+ unpricedNote:'No price in the app (buy from the operator)',insufficient:'Not enough wallet balance',badCard:'Invalid card details',testHint:'Test: 4242 4242 4242 4242 = success · 4000 0000 0000 0002 = declined',
+ capApplied:'daily cap applied',between:'Between cities',fromCity:'From city',toCity:'To city',findRoute:'Find route',autoNote:'Automatic route between cities',
+ interNote:'Intercity links come from BDZ rail data only; intercity buses are not included.',rides:'rides',ticket:'ticket',sameCity:'Pick two different cities'});
+Object.assign(I18.bg,{options:'Опции',theme:'Тема',myloc:'Моето местоположение',allLines:'Всички линии (цяла България)'});
+Object.assign(I18.en,{options:'Options',theme:'Theme',myloc:'My location',allLines:'All lines (all Bulgaria)'});
+Object.assign(I18.bg,{home:'Начална страница'});Object.assign(I18.en,{home:'Home page'});
+const LANG=(()=>{try{return localStorage.getItem('lang')==='en'?'en':'bg'}catch(e){return 'bg'}})(),L10=I18[LANG],t=k=>L10[k]||k;document.documentElement.lang=LANG;
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const kind=ty=>ty>=400&&ty<500?1:ty>=900&&ty<1000?0:ty>=800&&ty<900?11:ty>=100&&ty<200?2:ty>=700&&ty<800?3:ty;
+const ICO={0:'🚋',1:'🚇',2:'🚆',3:'🚌',4:'⛴️',5:'🚡',6:'🚠',7:'🚞',11:'🚎',12:'🚝'},ico=k=>ICO[k]||'🚍';
+let PRICES={},SC={};
+const hm=x=>{x=Math.floor(x/60);return String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};
+const nowS=()=>{const d=new Date();return d.getHours()*3600+d.getMinutes()*60+d.getSeconds()},dayIdx=()=>(new Date().getDay()+6)%7;
+const ymd=()=>{const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')};
+const fmtD=x=>x&&x.length===8?x.slice(6)+'.'+x.slice(4,6)+'.'+x.slice(0,4):'?';
+const money=(v,c)=>(!c||c==='EUR'?'€':'')+v.toFixed(2)+(c&&c!=='EUR'?' '+c:'');
+const priceOf=ds=>PRICES[ds]&&typeof PRICES[ds].ride==='number'?PRICES[ds]:null;
+const priceShort=ds=>{const p=priceOf(ds);return p?money(p.ride,p.cur):t('noinfo')};
+const priceTxt=ds=>{const p=priceOf(ds);return p?money(p.ride,p.cur)+' '+t('perride')+(p.cap?' · max '+money(p.cap,p.cur)+'/'+({bg:'ден',en:'day'}[LANG]):''):t('noinfo')};
+const dsName=id=>meta(id)?meta(id).name:id;
+const link=(u,x)=>/^https?:/.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(x||u)}</a>`:esc(x||u);
+/* fare of an ordered list of rides [{ds,metro}] -> {sum,unk,n} ; unknown networks are never guessed */
+function fareBy(rides){const by={};let prev=null;
+ for(const r of rides){const p=priceOf(r.ds),b=by[r.ds]||(by[r.ds]={n:0,lines:[]});
+  if(!(prev&&prev.ds===r.ds&&prev.metro&&r.metro&&p&&p.metroOneTicket))b.n++;if(r.name&&!b.lines.includes(r.name))b.lines.push(r.name);prev=r}
+ for(const ds in by){const b=by[ds],p=priceOf(ds);b.p=p;b.sum=p?(p.cap?Math.min(b.n*p.ride,p.cap):b.n*p.ride):null}
+ return by}
+function fare(rides){const by=fareBy(rides);let sum=0,unk=0,known=0;
+ for(const ds in by){const b=by[ds];if(b.sum==null){unk+=b.n;continue}known++;sum+=b.sum}
+ return{sum,unk,known}}
+const fareTxt=f=>f.known?money(f.sum)+(f.unk?' + '+t('noinfo'):''):t('noinfo');
+/* expandable source box for one network: where the price and the timetable come from */
+function srcHtml(ds){const p=PRICES[ds],m=SC[ds]&&SC[ds]._meta;
+ const pr=priceOf(ds)&&(p.sources||[]).length?(p.sources.map(x=>link(x.u,x.t)).join('<br>')+(p.note?'<br><i>'+esc(p.note)+'</i>':'')):t('noinfo');
+ let tm=t('noinfo');
+ if(m){const ex=m.end&&m.end<ymd();
+  tm=esc(m.agency||m.publisher||'GTFS')+' · '+t('valid')+' '+fmtD(m.start)+' – '+fmtD(m.end)+(ex?' ⚠ '+t('expired'):'')
+   +(m.origin?'<br>'+link(m.origin):'')+(m.site?'<br>'+link(m.site):'')+'<br><i>'+t('weekly')+'</i>'}
+ return `<details class="src"><summary>ⓘ ${t('source')} – ${esc(dsName(ds))}</summary><div><b>${t('price')}:</b> ${pr}<br><b>${t('times')}:</b> ${tm}</div></details>`}
+const hav=(a,b)=>{const r=Math.PI/180,x=(b[0]-a[0])*r,y=(b[1]-a[1])*r,h=Math.sin(x/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(y/2)**2;return 12742000*Math.asin(Math.sqrt(h))};
+
+/* ---------- map & modes ---------- */
+const map=L.map('map',{zoomControl:false,preferCanvas:true}).setView([42.7,25.3],7);
+const OSM='https://tile.openstreetmap.org/{z}/{x}/{y}.png',OSMA='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const SAT=['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','Imagery © Esri'];
+let tile,theme=store.get('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),sat=store.get('sat')==='1';
+function applyTheme(){if(tile)map.removeLayer(tile);
+ tile=sat?L.tileLayer(SAT[0],{maxZoom:19,attribution:SAT[1]}):L.tileLayer(OSM,{maxZoom:19,attribution:OSMA,className:theme==='dark'?'dark-tiles':''});
+ tile.addTo(map);tile.bringToBack();document.body.classList.toggle('dark',theme==='dark');
+ $('bTheme').textContent=t('theme')+': '+(theme==='dark'?t('dark'):t('light'));$('bSat').classList.toggle('on',sat);
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=theme==='dark'?'#161a20':'#ffffff'}
+$('bTheme').onclick=()=>{theme=theme==='dark'?'light':'dark';store.set('theme',theme);applyTheme()};
+$('bSat').onclick=()=>{sat=!sat;store.set('sat',sat?'1':'0');applyTheme()};
+try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{if(!store.get('theme')){theme=e.matches?'dark':'light';applyTheme()}})}catch(e){}
+[['bSat','sat'],['bLive','live'],['bAll','allLines'],['bPick','pick']].forEach(([i,k])=>$(i).textContent=t(k));$('bLoc').title=$('bLoc').ariaLabel=t('myloc');$('bHome').textContent='🏠 '+t('home');$('bMenuT').textContent=t('options');
+applyTheme();
+/* every line is drawn twice: a wider outline underneath (white for dark colours, near-black for light colours) and the coloured line on top */
+const lum=c=>{let h=String(c).replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');const n=parseInt(h,16);return((n>>16&255)*.299+(n>>8&255)*.587+(n&255)*.114)/255};
+const casingOf=c=>lum(c)>.62?'#1b1f27':'#ffffff';
+function strokes(layer,arr){const o={lineCap:'round',lineJoin:'round'};
+ arr.forEach(x=>{if(x.cw!==0)L.polyline(x.p,{...o,smoothFactor:x.sf||1,color:casingOf(x.c),weight:x.w+(x.cw==null?4:x.cw),opacity:Math.min(1,(x.o||1)*.9)}).addTo(layer)});
+ arr.forEach(x=>L.polyline(x.p,{...o,smoothFactor:x.sf||1,color:x.c,weight:x.w,opacity:x.o||1}).addTo(layer))}
+/* options dropdown */
+const menu=$('menu'),closeMenu=()=>{menu.hidden=true;$('bMenu').classList.remove('on')};
+$('bMenu').onclick=e=>{e.stopPropagation();menu.hidden=!menu.hidden;$('bMenu').classList.toggle('on',!menu.hidden)};
+menu.addEventListener('click',e=>{if(e.target.closest('.mi'))closeMenu()});
+document.addEventListener('click',e=>{if(!menu.hidden&&!e.target.closest('#menu'))closeMenu()});
+const lineLayer=L.layerGroup().addTo(map),selLayer=L.layerGroup().addTo(map),vehLayer=L.layerGroup().addTo(map),
+ routeLayer=L.layerGroup().addTo(map),planLayer=L.layerGroup().addTo(map),meLayer=L.layerGroup().addTo(map);
+
+/* ---------- sheet ---------- */
+let sheetState=0;const snaps=()=>[150,Math.round(innerHeight*.45),Math.round(innerHeight*.85)],setSh=px=>document.documentElement.style.setProperty('--sh',px+'px');
+function sheet(n){sheetState=n;$('sheet').style.transition='';setSh(snaps()[n])}
+/* drag the header (handle + tabs) to resize the sheet freely; on release it snaps to the nearest of 3 heights, a quick flick jumps to the next one; a tap on the handle cycles */
+(function(){const hd=$('head'),sh=$('sheet');let d=null,sup=false;
+ const mv=e=>{if(!d||e.pointerId!==d.id)return;const dy=e.clientY-d.y;
+  if(!d.on){if(Math.abs(dy)<6)return;d.on=true;sh.style.transition='none'}
+  const n=performance.now();d.v=.7*d.v+.3*((e.clientY-d.ly)/Math.max(1,n-d.lt));d.ly=e.clientY;d.lt=n;
+  setSh(Math.max(110,Math.min(snaps()[2],d.h-dy)))};
+ const end=e=>{if(!d||e.pointerId!==d.id)return;removeEventListener('pointermove',mv);removeEventListener('pointerup',end);removeEventListener('pointercancel',end);
+  const was=d.on,v=d.v;d=null;if(!was)return;sup=true;setTimeout(()=>sup=false,60);
+  sh.style.transition='';const s=snaps(),h=sh.getBoundingClientRect().height;let n=0,b=1e9;s.forEach((x,i)=>{const k=Math.abs(x-h);if(k<b){b=k;n=i}});
+  if(v<-.5){const i=s.findIndex(x=>x>h+8);n=i<0?2:i}else if(v>.5){let i=-1;s.forEach((x,j)=>{if(x<h-8)i=j});n=i<0?0:i}
+  sheet(n)};
+ hd.addEventListener('pointerdown',e=>{d={id:e.pointerId,y:e.clientY,h:sh.getBoundingClientRect().height,ly:e.clientY,lt:performance.now(),v:0,on:false};
+  addEventListener('pointermove',mv);addEventListener('pointerup',end);addEventListener('pointercancel',end)});
+ hd.addEventListener('click',e=>{if(sup){e.stopPropagation();e.preventDefault()}},true);
+ $('grab').addEventListener('click',()=>sheet((sheetState+1)%3));
+ addEventListener('resize',()=>sheet(sheetState))})();
+sheet(0);
+let tab='lines';
+document.querySelectorAll('#tabs button').forEach(b=>{b.textContent=t(b.dataset.t);b.onclick=()=>{tab=b.dataset.t;
+ document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));renderBody();if(sheetState==0)sheet(1)}});
+$('q').placeholder=t('search');
+
+/* ---------- data ---------- */
+let index=[],DS={},cur=null,active=null,caps={live:[]};
+const meta=id=>index.find(c=>c.id===id);
+async function load(id){if(DS[id])return DS[id];
+ const r=await fetch('data/'+id+'.json');if(!r.ok)throw 0;
+ DS[id]=(await r.json()).map(x=>({...x,k:kind(x.type),ds:id}));return DS[id];}
+async function loadSched(id){if(id in SC)return SC[id];const m=meta(id);if(m&&m.sched===false){SC[id]=null;return null}
+ try{const r=await fetch('data/'+id+'.sched.json');SC[id]=r.ok?await r.json():null}catch(e){SC[id]=null}return SC[id]}
+async function ensure(id){try{await load(id)}catch(e){}await loadSched(id)}
+async function init(){
+ try{index=await (await fetch('data/index.json')).json()}catch(e){index=[]}
+ try{PRICES=await (await fetch('prices.json')).json()}catch(e){}
+ try{caps=await (await fetch('/api/capabilities')).json()}catch(e){}
+ if(!index.length){$('body').innerHTML='<p class="mut">'+t('nodata')+' – build_data.py</p>';return}
+ $('city').innerHTML=index.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ $('city').onchange=()=>openCity($('city').value,true);
+ const first=index.find(c=>c.id==='sofia')||index.find(c=>c.kind!=='rail')||index[0];
+ await openCity(first.id,true);restoreRoute();locate(true);if(showAll)loadAllData();}
+async function openCity(id,fly){cur=id;$('city').value=id;active=null;sel=null;selLayer.clearLayers();
+ const m=meta(id);if(fly)map.setView(m.center,m.zoom);
+ await ensure(id);
+ drawLines();renderBody();startLive();}
+let lineFocus=false;
+function planShown(){return planSt==='done'&&optSel>=0&&!!opts[optSel]}
+function isFocus(){return !!active||planShown()||(tab==='route'&&legs.length>0)}
+function focusRoutes(){if(active)return null;let rs=null;
+ if(planShown())rs=opts[optSel].legs.filter(l=>l.t==='ride'&&l.ds===cur).map(l=>l.route.id);
+ else if(tab==='route'&&legs.length)rs=legs.filter(l=>l.ds===cur).map(l=>l.id);
+ return rs&&new Set(rs)}
+function vehOk(r){if(active)return !!r&&r.name===active;const f=focusRoutes();return f?!!r&&f.has(r.id):true}
+let showAll=store.get('all')==='1',allBusy=false,dTimer=null;
+const bbox=l=>{let a=90,b=180,c=-90,d=-180;for(const p of l){if(p[0]<a)a=p[0];if(p[0]>c)c=p[0];if(p[1]<b)b=p[1];if(p[1]>d)d=p[1]}return[a,b,c,d]};
+function drawLines(){lineLayer.clearLayers();lineFocus=isFocus();if(lineFocus)return;
+ if(!showAll){strokes(lineLayer,(DS[cur]||[]).map(r=>({p:r.line,c:r.color,w:2.5,cw:2,o:.75})));return}
+ /* every loaded network, only what is inside the (padded) view; thinner and simplified when zoomed out */
+ const z=map.getZoom(),bd=map.getBounds().pad(.25),S=bd.getSouth(),W=bd.getWest(),N=bd.getNorth(),E=bd.getEast(),seen=new Set(),arr=[];
+ const w=z<9?1.5:z<11?2:2.5,cw=z<9?0:z<11?1.5:2;
+ for(const id in DS)for(const r of DS[id]){if(z<12){const k=id+'|'+r.id;if(seen.has(k))continue;seen.add(k)}
+  const b=r._bb||(r._bb=bbox(r.line));if(b[2]<S||b[0]>N||b[3]<W||b[1]>E)continue;arr.push({p:r.line,c:r.color,w,cw,o:.75,sf:z<10?3:1})}
+ strokes(lineLayer,arr)}
+function scheduleDraw(){clearTimeout(dTimer);dTimer=setTimeout(()=>{if(!isFocus())drawLines()},150)}
+map.on('moveend',()=>{if(showAll)scheduleDraw()});
+async function loadAllData(){if(allBusy)return;allBusy=true;let n=0;const ids=index.map(c=>c.id),lab=()=>{$('bAll').textContent=t('allLines')+(n<ids.length?' ('+n+'/'+ids.length+')':'')};lab();
+ await Promise.all(ids.map(async id=>{try{await load(id)}catch(e){}n++;lab();scheduleDraw()}));allBusy=false;lab();scheduleDraw();if(tab==='lines'&&!sel)renderLines()}
+function setAll(on,move){showAll=on;store.set('all',on?'1':'0');$('bAll').classList.toggle('on',on);
+ if(on){if(move&&map.getZoom()>9)map.setView([42.75,25.3],7);loadAllData()}drawLines();if(tab==='lines'&&!sel)renderLines()}
+$('bAll').onclick=()=>setAll(!showAll,true);$('bAll').classList.toggle('on',showAll);
+function syncLines(){if(isFocus()!==lineFocus){drawLines();pollLive()}}
+
+/* ---------- lines tab ---------- */
+$('q').oninput=()=>{sel=null;tab='lines';document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='lines'));
+ renderBody();if($('q').value&&sheetState==0)sheet(1)};
+function renderBody(){syncLines();tab==='lines'?renderLines():tab==='tickets'?renderTickets():renderRoute()}
+function renderLines(){if(sel)return renderDetail();const q=$('q').value.trim().toLowerCase(),seen=new Set(),allQ=showAll&&!!q;
+ const pool=allQ?Object.values(DS).flat():(DS[cur]||[]);
+ const res=pool.filter(r=>!q||r.name.toLowerCase().includes(q)||r.long.toLowerCase().includes(q))
+  .filter(r=>{const k=r.ds+r.name+r.k;if(seen.has(k))return false;seen.add(k);return true}).slice(0,100);
+ $('body').innerHTML=(liveStatusHtml())+(res.map(r=>`<div class="row" data-n="${esc(r.name)}" data-d="${esc(r.ds)}"><span class="b" style="background:${r.color}">${ico(r.k)} ${esc(r.name)}</span><span>${esc(r.long||'')}</span><span class="pr mut">${esc(allQ?dsName(r.ds):priceShort(r.ds))}</span></div>`).join('')||`<p class="mut">${t('noresult')}</p>`);
+ $('body').querySelectorAll('.row').forEach(e=>e.onclick=async()=>{const d=e.dataset.d;if(d!==cur)await openCity(d,false);showLine(d,e.dataset.n)});}
+let sel=null;
+function showLine(id,name){active=name;sel={name,dir:0,stop:null};selLayer.clearLayers();drawLines();const b=L.latLngBounds([]),rs=(DS[id]||[]).filter(r=>r.name===name);
+ strokes(selLayer,rs.map(r=>({p:r.line,c:r.color,w:6,cw:4,o:.95})));
+ rs.forEach(r=>{b.extend(r.line);r.stops.forEach(s=>L.circleMarker([s[1],s[2]],{radius:5,color:'#222',weight:1.5,fillColor:'#fff',fillOpacity:1}).bindTooltip(esc(s[0])).addTo(selLayer))});
+ if(b.isValid())map.fitBounds(b,{paddingBottomRight:[20,Math.round(innerHeight*.5)],paddingTopLeft:[20,70]});sheet(1);renderBody();pollLive();}
+function clearSel(){sel=null;active=null;selLayer.clearLayers();drawLines();pollLive();if(tab==='lines')renderLines()}
+map.on('click',e=>{if(pickMode)return setPoint(e.latlng);clearSel()});
+function deps(e,i,from,today){const day=dayIdx(),pick=(di,a)=>{const o=[];for(const m in e.t)if(m[di]==='1')for(const x of e.t[m])o.push(x+a);return o};
+ let l=pick(day,0);if(!today)l=l.concat(pick((day+1)%7,86400));
+ l=[...new Set(l)].sort((a,b)=>a-b).map(x=>x+e.d[i]);return today?l.filter(x=>x>=0&&x<86400):l.filter(x=>x>=from)}
+function renderDetail(){const vars=(DS[cur]||[]).filter(r=>r.name===sel.name),v=vars[sel.dir]||vars[0];if(!v){sel=null;return renderLines()}
+ const st=v.stops,last=st.length-1;
+ if(sel.stop==null||sel.stop>=st.length)sel.stop=me?nearestIdx(st.map(x=>[x[1],x[2]]),[0,me[0],me[1]]):0;
+ const sc=SC[cur],e=sc&&sc[v.id+'|'+v.dir],n0=nowS();let tt=`<p class="mut">${t('notimes')}</p>`;
+ if(e&&e.a.length===st.length){const all=deps(e,sel.stop,0,true),nx=deps(e,sel.stop,n0,false).slice(0,6);
+  tt=(nx.map(x=>`<div class="dep"><b>${hm(x)}</b> <span class="mut">${t('in_')} ${Math.max(0,Math.round((x-n0)/60))} ${t('min')} · ${t('arrives')} ${hm(x-e.d[sel.stop]+e.a[last])} ${t('at')} ${esc(st[last][0])}</span></div>`).join('')||`<p class="mut">${t('nomore')}</p>`)
+   +(all.length?`<details class="src"><summary>${t('alltoday')} (${all.length})</summary><div class="chips">${all.map(x=>`<span>${hm(x)}</span>`).join('')}</div></details>`:'')}
+ const opt=(a,s)=>a.map(([k,x])=>`<option value="${k}"${k==s?' selected':''}>${esc(x)}</option>`).join('');
+ $('body').innerHTML=liveStatusHtml()+`<button class="go sec" id="dBack">${t('back')}</button><div class="card"><div class="hd"><span class="b" style="background:${v.color}">${ico(v.k)} ${esc(v.name)}</span> ${esc(v.long||'')}</div>
+  <div>${t('price')}: <b>${esc(priceTxt(cur))}</b></div>
+  <label class="mut">${t('dir')}</label><select class="f" id="dDir">${opt(vars.map((r,i)=>[i,t('to_')+' '+(r.stops[r.stops.length-1]||[''])[0]]),sel.dir)}</select>
+  <label class="mut">${t('stop')}</label><select class="f" id="dStop">${opt(st.map((x,i)=>[i,x[0]]),sel.stop)}</select>
+  <b>${t('next')}</b>${tt}</div>`+srcHtml(cur);
+ $('dBack').onclick=clearSel;$('dDir').onchange=ev=>{sel.dir=+ev.target.value;sel.stop=null;renderDetail()};$('dStop').onchange=ev=>{sel.stop=+ev.target.value;renderDetail()}}
+
+/* ---------- live vehicles ---------- */
+let liveOn=true,liveTimer=null,liveInfo=null;
+$('bLive').classList.add('on');
+$('bLive').onclick=()=>{liveOn=!liveOn;$('bLive').classList.toggle('on',liveOn);startLive()};
+const hasLive=()=>caps.live.includes(cur)&&meta(cur)&&meta(cur).live;
+function liveInner(){if(!hasLive())return t('live0');return liveInfo?`🟢 ${t('live')}: ${liveInfo.n} ${t('veh')} · ${t('ago')} ${liveInfo.age}${t('s')}`:''}
+function liveStatusHtml(){return liveOn?`<p class="mut" id="liveSt">${liveInner()}</p>`:''}
+function startLive(){clearInterval(liveTimer);vehLayer.clearLayers();liveInfo=null;if(!liveOn||!hasLive()){if(tab==='lines')renderLines();return}
+ pollLive();liveTimer=setInterval(pollLive,10000)}
+async function pollLive(){if(!liveOn||!hasLive())return;const id=cur;
+ try{const d=await (await fetch('/api/vehicles/'+id)).json();if(id!==cur||!d.vehicles)return;
+  const byId={};(DS[id]||[]).forEach(r=>byId[r.id]=r);vehLayer.clearLayers();let n=0,newest=0;
+  d.vehicles.forEach(v=>{if(d.now-v.ts>300)return;const r=byId[v.route];if(!vehOk(r))return;n++;newest=Math.max(newest,v.ts);
+   L.marker([v.lat,v.lon],{icon:L.divIcon({className:'',html:`<div class="veh" style="background:${r?r.color:'#555'}">${r?ico(r.k)+' ':''}${esc(r?r.name:'?')}</div>`,iconSize:[50,22],iconAnchor:[25,11]})}).addTo(vehLayer)});
+  liveInfo={n,age:newest?Math.max(0,d.now-newest):0};const e=$('liveSt');if(e)e.innerHTML=liveInner();else if(tab==='lines'&&!sel&&!$('q').matches(':focus'))renderLines();
+ }catch(e){}}
+
+/* ---------- my location ---------- */
+let watch=null,me=null,firstFix=true;
+function locate(auto){if(!navigator.geolocation)return;
+ if(watch!==null&&!auto){if(me)map.setView(me,Math.max(map.getZoom(),15));return}
+ if(watch!==null)return;
+ watch=navigator.geolocation.watchPosition(p=>{me=[p.coords.latitude,p.coords.longitude];meLayer.clearLayers();
+  L.circle(me,{radius:p.coords.accuracy,color:'#1a73e8',weight:1,fillOpacity:.1}).addTo(meLayer);
+  L.marker(me,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false}).addTo(meLayer);
+  if(firstFix||!auto){firstFix=false;const near=index.filter(c=>c.kind!=='rail').map(c=>[hav(me,c.center),c]).sort((a,b)=>a[0]-b[0])[0];
+   if(near&&near[0]<40000){openCity(near[1].id,false).then(()=>map.setView(me,15))}else if(!auto)map.setView(me,15)}},
+  ()=>{watch=null;if(!auto)alert(t('noloc'))},{enableHighAccuracy:true,maximumAge:5000});}
+$('bLoc').onclick=()=>{firstFix=true;locate(false)};
+
+/* ---------- route builder (multi-transport, multi-city) ---------- */
+let legs=[];const COL=['#e8453c','#1a73e8','#0b9d58','#f29900','#9334e6','#00897b'];
+function save(){store.set('legs',JSON.stringify(legs))}
+async function restoreRoute(){try{legs=JSON.parse(store.get('legs')||'[]')}catch(e){legs=[]}
+ for(const l of legs){try{await load(l.ds)}catch(e){}}drawRoute()}
+let form={ds:null,name:null,dirIdx:0,from:0,to:1};
+/* ---- click-to-route: A then B on the map, timetable-based search with several options ---- */
+let pickMode=false,pts={a:null,b:null},mk={},opts=[],optSel=-1,depT=null,planSt='idle',planNotes=[],planTok=0,netCache=null,manOpen=false;
+let planInter=false,ic={from:null,to:null},icOpen=false;
+const nearCity=p=>index.filter(c=>c.kind!=='rail').map(c=>[hav([p.lat,p.lng],c.center),c]).sort((x,y)=>x[0]-y[0])[0];
+const placeName=p=>{const c=nearCity(p),ll=p.lat.toFixed(4)+', '+p.lng.toFixed(4);return c&&c[0]<40000?t('near')+' '+c[1].name+' ('+ll+')':ll};
+$('bPick').onclick=()=>{pickMode=!pickMode;$('bPick').classList.toggle('on',pickMode);$('map').classList.toggle('pick',pickMode);
+ if(pickMode){tab='route';document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='route'));if(sheetState==0)sheet(1);renderBody()}};
+function pin(k){if(mk[k]){map.removeLayer(mk[k]);mk[k]=null}const p=pts[k];if(!p)return;
+ mk[k]=L.marker(p,{draggable:true,icon:L.divIcon({className:'',html:`<div class="pin ${k}">${k.toUpperCase()}</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map);
+ mk[k].on('dragend',e=>{pts[k]=e.target.getLatLng();if(pts.a&&pts.b)plan();else renderBody()})}
+function setPoint(ll){if(!pts.a||pts.b){pts={a:ll,b:null};opts=[];planSt='idle';planLayer.clearLayers();pin('b')}else pts.b=ll;
+ pin('a');pin('b');tab='route';document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='route'));
+ if(sheetState==0)sheet(1);if(pts.a&&pts.b)plan();else renderBody()}
+async function plan(){if(!pts.a||!pts.b)return;const tok=++planTok;planSt='busy';opts=[];optSel=-1;planLayer.clearLayers();renderBody();
+ const ca=nearCity(pts.a),cb=nearCity(pts.b),inter=hav([pts.a.lat,pts.a.lng],[pts.b.lat,pts.b.lng])>25000||!!(ca&&cb&&ca[1].id!==cb[1].id);planInter=inter;
+ const ids=new Set();[pts.a,pts.b].forEach(p=>{const c=nearCity(p);if(c&&c[0]<40000)ids.add(c[1].id)});
+ index.filter(c=>c.kind==='rail').forEach(c=>ids.add(c.id));
+ await Promise.all([...ids].map(ensure));if(tok!==planTok)return;
+ const sets=[...ids].map(id=>({id,kind:(meta(id)||{}).kind,routes:DS[id]||[],sched:SC[id]||null}));
+ planNotes=sets.filter(x=>!x.sched&&x.routes.length).map(x=>dsName(x.id)+': '+t('nosched'));if(inter)planNotes.push(t('interNote'));
+ const key=[...ids].join();if(!netCache||netCache.key!==key)netCache={key,net:Planner.prepare(sets)};
+ opts=Planner.search(netCache.net,[pts.a.lat,pts.a.lng],[pts.b.lat,pts.b.lng],depT==null?nowS():depT,dayIdx(),{inter});
+ opts.forEach(o=>o.fare=fare(rideList(o)));
+ planSt='done';renderBody();if(opts.length)showOpt(0)}
+function showOpt(i){optSel=i;planLayer.clearLayers();const o=opts[i],all=L.latLngBounds([]);if(!o)return;const S=[];
+ o.legs.forEach(l=>{if(l.t==='walk'){L.polyline([l.from.p,l.to.p],{color:'#7a8494',weight:4,dashArray:'4 8'}).addTo(planLayer);all.extend([l.from.p,l.to.p]);return}
+  let pl=[l.from.p,l.to.p];const a1=nearestIdx(l.route.line,[0,l.from.p[0],l.from.p[1]]),a2=nearestIdx(l.route.line,[0,l.to.p[0],l.to.p[1]]);if(a1<a2)pl=l.route.line.slice(a1,a2+1);
+  S.push({p:pl,c:l.color,w:7,cw:4,o:.95});all.extend(pl)});
+ strokes(planLayer,S);
+ o.legs.filter(l=>l.t==='ride').forEach(l=>[l.from,l.to].forEach(s=>L.circleMarker(s.p,{radius:6,color:l.color,weight:3,fillColor:'#fff',fillOpacity:1}).bindTooltip(esc(s.n)).addTo(planLayer)));
+ if(all.isValid())map.fitBounds(all,{paddingBottomRight:[20,Math.round(innerHeight*.5)],paddingTopLeft:[20,70]});
+ document.querySelectorAll('.opt').forEach((e,j)=>e.classList.toggle('sel',j===i));
+ if(isFocus()!==lineFocus)drawLines();pollLive()}
+function optHtml(o,i){const dur=Math.round((o.arrive-o.leave)/60),rides=o.legs.filter(l=>l.t==='ride');
+ const legs=o.legs.map(l=>l.t==='walk'?`<div class="mut">🚶 ${Math.max(1,Math.round(l.sec/60))} ${t('min')} ${t('walk')}</div>`
+  :`<div class="lg"><span class="b" style="background:${l.color}">${ico(l.k)} ${esc(l.name)}</span> ${esc(l.from.n)} <b>${hm(l.dep)}</b> → ${esc(l.to.n)} <b>${hm(l.arr)}</b><div class="mut">${esc(dsName(l.ds))} · ${esc(priceShort(l.ds))}</div></div>`).join('');
+ return `<div class="card opt${i===optSel?' sel':''}" data-o="${i}"><div class="hd"><b>${hm(o.leave)} → ${hm(o.arrive)}</b> · ${Math.floor(dur/60)?Math.floor(dur/60)+' h ':''}${dur%60} ${t('min')}</div>
+  <div class="mut">${o.changes?o.changes+' '+t(o.changes===1?'change':'changes'):t('direct')} · ${t('total')}: <b>${esc(fareTxt(o.fare))}</b></div>${legs}
+  <button class="go" data-buy="${i}"${o.fare.known?'':' disabled'}>🎫 ${t('buy')} · ${esc(fareTxt(o.fare))}</button>
+  ${[...new Set(rides.map(l=>l.ds))].map(srcHtml).join('')}</div>`}
+function interHtml(){const cs=index.filter(c=>c.kind!=='rail');if(cs.length<2)return '';
+ const f=ic.from||cur,to=ic.to||(cs.find(c=>c.id!==f)||{}).id,o=v=>cs.map(c=>`<option value="${c.id}"${c.id===v?' selected':''}>${esc(c.name)}</option>`).join('');
+ return `<details class="src" id="icD"${icOpen?' open':''}><summary>🚆 ${t('between')}</summary><div><label class="mut">${t('fromCity')}</label><select class="f" id="icA">${o(f)}</select>
+  <label class="mut">${t('toCity')}</label><select class="f" id="icB">${o(to)}</select><button class="go" id="icGo">${t('findRoute')}</button></div></details>`}
+function planHtml(){
+ let h=`<div class="card"><div>A: ${pts.a?esc(placeName(pts.a)):'<span class="mut">'+t('clickA')+'</span>'}</div>
+  <div>B: ${pts.b?esc(placeName(pts.b)):'<span class="mut">'+(pts.a?t('clickB'):'—')+'</span>'}</div>
+  <div style="display:flex;gap:6px"><button class="go${pickMode?'':' sec'}" id="pPick">🧭 ${t('pick')}</button><button class="go sec" id="pSwap" style="width:60px">⇄</button><button class="go sec" id="pClr" style="width:60px">✕</button></div>
+  <label class="mut">${t('depart')}</label><div style="display:flex;gap:6px"><input type="time" class="f" id="pTime" value="${depT==null?'':hm(depT)}"><button class="go sec" id="pNow" style="width:90px">${t('now')}</button></div></div>`;
+ h+=interHtml();
+ if(planSt==='busy')h+=`<p class="mut">${t('searching')}</p>`;
+ else if(planSt==='done')h+=(planInter&&opts.length?`<p class="mut">🚆 ${t('autoNote')}</p>`:'')+(opts.length?opts.map(optHtml).join(''):`<p class="mut">${t('noroutes')}</p>`)+(planNotes.length?`<p class="mut">${t('notes')}: ${planNotes.map(esc).join('; ')}</p>`:'');
+ return h}
+function bindPlan(){
+ $('pPick').onclick=()=>$('bPick').click();
+ document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();openPay(rideList(opts[+b.dataset.buy]))});
+ if($('icD')){$('icD').ontoggle=e=>{icOpen=e.target.open};$('icA').onchange=e=>{ic.from=e.target.value};$('icB').onchange=e=>{ic.to=e.target.value};
+  $('icGo').onclick=()=>{const a=meta($('icA').value),b=meta($('icB').value);if(!a||!b||a.id===b.id)return alert(t('sameCity'));ic={from:a.id,to:b.id};
+   pts={a:L.latLng(a.center[0],a.center[1]),b:L.latLng(b.center[0],b.center[1])};pin('a');pin('b');plan()}}
+ $('pClr').onclick=()=>{pts={a:null,b:null};opts=[];planSt='idle';planInter=false;planTok++;pin('a');pin('b');planLayer.clearLayers();renderBody()};
+ $('pSwap').onclick=()=>{pts={a:pts.b,b:pts.a};pin('a');pin('b');if(pts.a&&pts.b)plan();else renderBody()};
+ $('pNow').onclick=()=>{depT=null;if(pts.a&&pts.b)plan();else renderBody()};
+ $('pTime').onchange=e=>{const v=e.target.value.split(':');depT=v.length==2?(+v[0])*3600+(+v[1])*60:null;if(pts.a&&pts.b)plan()};
+ document.querySelectorAll('.opt').forEach(e=>e.onclick=ev=>{if(ev.target.closest('details'))return;showOpt(+e.dataset.o)})}
+
+async function renderRoute(){
+ form.ds=form.ds||cur;try{await ensure(form.ds)}catch(e){}
+ const ds=DS[form.ds]||[],names=[...new Set(ds.map(r=>r.name))];
+ if(!names.includes(form.name))form.name=names[0];
+ const vars=ds.filter(r=>r.name===form.name),v=vars[form.dirIdx]||vars[0],st=v?v.stops:[];
+ if(form.from>=st.length-1)form.from=0;if(form.to<=form.from)form.to=Math.min(form.from+1,st.length-1);
+ const opt=(a,sel)=>a.map(([val,txt])=>`<option value="${val}"${val==sel?' selected':''}>${esc(txt)}</option>`).join('');
+ const legHtml=legs.map((l,i)=>{const prev=legs[i-1];let walk='';
+  if(prev){const d=Math.round(hav(prev.b.slice(1),l.a.slice(1)));walk=`<div class="mut">🚶 ${d} m ${t('walk')}</div>`}
+  return walk+`<div class="card"><span class="b" style="background:${l.color}">${ico(((DS[l.ds]||[]).find(x=>x.id===l.id&&x.dir===l.dir)||{}).k)} ${esc(l.name)}</span> ${esc(l.a[0])} → ${esc(l.b[0])}
+   <div class="mut">${esc(dsName(l.ds))} · ${esc(priceShort(l.ds))}</div><button class="go sec" data-del="${i}">✕</button></div>`}).join('')||`<p class="mut">${t('empty')}</p>`;
+ const mRides=legs.map(l=>{const r=(DS[l.ds]||[]).find(x=>x.id===l.id&&x.dir===l.dir);return{ds:l.ds,metro:!!r&&r.k===1,name:l.name,from:l.a[0],to:l.b[0]}}),mf=fare(mRides);
+ const totHtml=legs.length?`<div class="card">${t('total')}: <b>${esc(fareTxt(mf))}</b><button class="go" id="mBuy"${mf.known?'':' disabled'}>🎫 ${t('buy')}</button></div>`+[...new Set(legs.map(l=>l.ds))].map(srcHtml).join(''):'';
+ $('body').innerHTML=planHtml()+`<details class="src" id="manD"${manOpen?' open':''}><summary>${t('manual')}</summary>`+legHtml+totHtml+`<div class="card"><b>${t('addleg')}</b>
+  <label class="mut">${t('city')}</label><select class="f" id="fDs">${opt(index.map(c=>[c.id,c.name]),form.ds)}</select>
+  <label class="mut">${t('line')}</label><select class="f" id="fLine">${opt(names.map(n=>[n,n]),form.name)}</select>
+  <label class="mut">${t('dir')}</label><select class="f" id="fDir">${opt(vars.map((r,i)=>[i,t('to_')+' '+(r.stops[r.stops.length-1]||[''])[0]]),form.dirIdx)}</select>
+  <label class="mut">${t('from')}</label><select class="f" id="fFrom">${opt(st.map((s,i)=>[i,s[0]]),form.from)}</select>
+  <label class="mut">${t('to')}</label><select class="f" id="fTo">${opt(st.map((s,i)=>[i,s[0]]).filter(([i])=>i>form.from),form.to)}</select>
+  <button class="go" id="fAdd">${t('add')}</button></div>
+  <button class="go sec" id="fClr">${t('clear')}</button></details>`;
+ bindPlan();if($('mBuy'))$('mBuy').onclick=()=>openPay(mRides);$('manD').ontoggle=e=>{manOpen=e.target.open};
+ const re=(id,fn)=>$(id).onchange=e=>{fn(e.target.value);renderRoute()};
+ re('fDs',x=>{form={ds:x,name:null,dirIdx:0,from:0,to:1}});re('fLine',x=>{form.name=x;form.dirIdx=0;form.from=0;form.to=1});
+ re('fDir',x=>{form.dirIdx=+x;form.from=0;form.to=1});re('fFrom',x=>{form.from=+x});re('fTo',x=>{form.to=+x});
+ $('fAdd').onclick=()=>{if(!v||form.to<=form.from)return;
+  legs.push({ds:form.ds,name:v.name,color:COL[legs.length%COL.length],id:v.id,dir:v.dir,a:[st[form.from][0],st[form.from][1],st[form.from][2]],b:[st[form.to][0],st[form.to][1],st[form.to][2]]});
+  save();drawRoute(true);renderRoute()};
+ $('fClr').onclick=()=>{legs=[];save();drawRoute();renderRoute()};
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{legs.splice(+b.dataset.del,1);save();drawRoute();renderRoute()})}
+function nearestIdx(line,p){let bi=0,bd=1e18;line.forEach((q,i)=>{const d=(q[0]-p[1])**2+(q[1]-p[2])**2;if(d<bd){bd=d;bi=i}});return bi}
+function drawRoute(fit){routeLayer.clearLayers();const all=L.latLngBounds([]),S=[];
+ legs.forEach((l,i)=>{const r=(DS[l.ds]||[]).find(x=>x.id===l.id&&x.dir===l.dir);let pp=[[l.a[1],l.a[2]],[l.b[1],l.b[2]]];
+  if(r){const i1=nearestIdx(r.line,l.a),i2=nearestIdx(r.line,l.b);if(i1<i2)pp=r.line.slice(i1,i2+1)}
+  S.push({p:pp,c:l.color,w:7,cw:4,o:.95});all.extend(pp);
+  if(legs[i-1])L.polyline([[legs[i-1].b[1],legs[i-1].b[2]],[l.a[1],l.a[2]]],{color:'#7a8494',weight:3,dashArray:'4 8'}).addTo(routeLayer)});
+ strokes(routeLayer,S);
+ legs.forEach((l,i)=>[l.a,l.b].forEach((s,j)=>L.circleMarker([s[1],s[2]],{radius:7,color:l.color,weight:3,fillColor:'#fff',fillOpacity:1}).bindTooltip((j?'':(i+1)+'. ')+esc(s[0])).addTo(routeLayer)));
+ if(fit&&all.isValid())map.fitBounds(all,{paddingBottomRight:[20,260],paddingTopLeft:[20,70]});syncLines()}
+
+/* ---------- mock checkout + tickets (CONCEPT ONLY - see payments.js) ---------- */
+function goTab(n){tab=n;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===n));renderBody();if(sheetState==0)sheet(1)}
+const rideList=o=>o.legs.filter(l=>l.t==='ride').map(l=>({ds:l.ds,metro:l.k===1,name:l.name,from:l.from.n,to:l.to.n}));
+function orderFromRides(rides){const by=fareBy(rides),items=[],unpriced=[];
+ for(const ds in by){const b=by[ds],mine=rides.filter(r=>r.ds===ds);
+  if(b.sum==null){unpriced.push({network:dsName(ds),lines:b.lines});continue}
+  items.push({ds,network:dsName(ds),lines:b.lines,from:mine[0].from,to:mine[mine.length-1].to,n:b.n,unit:b.p.ride,total:b.sum,cur:b.p.cur,capped:!!b.p.cap&&b.n*b.p.ride>b.p.cap})}
+ const o=Payments.order(items,items[0]&&items[0].cur);o.unpriced=unpriced;return o}
+let pay=null;
+function openPay(rides){const order=orderFromRides(rides);if(!order.items.length)return;
+ pay={order,method:'card',step:'review',msg:'',card:{num:'',exp:'',cvc:'',name:''}};$('pay').classList.add('show');renderPay()}
+function closePay(){$('pay').classList.remove('show');$('payBox').innerHTML='';pay=null;if(tab==='tickets')renderTickets()}
+$('pay').onclick=e=>{if(e.target.id==='pay'&&pay&&pay.step!=='busy')closePay()};
+const dt=x=>new Date(x).toLocaleString(undefined,{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+function tkHtml(k){const ok=Date.now()<k.validUntil;
+ return `<div class="card tk${ok?'':' old'}"><div style="display:flex;gap:10px"><div class="qr">${Payments.qr(k.code)}</div><div style="min-width:0"><div class="hd">${esc(k.network)}</div>
+  <div class="mut">${k.lines.map(esc).join(', ')}<br>${esc(k.from)} → ${esc(k.to)}</div><div>${k.n} ${t('rides')} · <b>${money(k.price,k.cur)}</b></div>
+  <div class="mut">${ok?t('validT'):t('expiredT')} · ${t('validUntil')} ${dt(k.validUntil)}</div><div class="mut">${esc(k.id)} <span class="demo">DEMO</span></div></div></div></div>`}
+function renderPay(){const p=pay,b=$('payBox'),o=p.order,head=`<div class="li"><b style="font-size:18px">${t('checkout')}</b><span class="demo">DEMO</span></div>`;
+ if(p.step==='busy'){b.innerHTML=head+`<div class="spin"></div><p class="mut" style="text-align:center">${t('processing')}</p>`;return}
+ if(p.step==='ok'){b.innerHTML=head+`<div class="big">✅</div><p style="text-align:center"><b>${t('paidOk')}</b> · ${money(o.total,o.cur)}</p>`+p.res.tickets.map(tkHtml).join('')
+  +`<button class="go" id="pTk">${t('myTickets')}</button><button class="go sec" id="pDone">${t('done')}</button>`;
+  $('pDone').onclick=closePay;$('pTk').onclick=()=>{closePay();goTab('tickets')};return}
+ if(p.step==='err'){b.innerHTML=head+`<div class="big">❌</div><p style="text-align:center"><b>${esc(p.msg)}</b></p><button class="go" id="pRetry">${t('tryAgain')}</button><button class="go sec" id="pX">${t('cancel')}</button>`;
+  $('pRetry').onclick=()=>{p.step='review';p.msg='';renderPay()};$('pX').onclick=closePay;return}
+ const items=o.items.map(i=>`<div class="card"><div class="li"><span>${esc(i.network)} · ${i.n}× ${t('ticket')}</span><b>${money(i.total,i.cur)}</b></div><div class="mut">${i.lines.map(esc).join(', ')} · ${esc(i.from)} → ${esc(i.to)}${i.capped?' · '+t('capApplied'):''}</div></div>`).join('');
+ const un=o.unpriced.length?`<p class="mut">⚠ ${t('unpricedNote')}: ${o.unpriced.map(u=>esc(u.network)).join(', ')}</p>`:'';
+ const M=[['card','💳',t('mCard')],['pay','📱',t('mPay')],['wallet','👛',t('mWallet')+' ('+money(Payments.wallet.get())+')']];
+ const card=p.method==='card'?`<input class="f" id="cNum" inputmode="numeric" autocomplete="off" placeholder="${t('cardNo')}" value="${esc(p.card.num)}">
+  <div style="display:flex;gap:6px"><input class="f" id="cExp" inputmode="numeric" autocomplete="off" placeholder="MM/YY" value="${esc(p.card.exp)}"><input class="f" id="cCvc" inputmode="numeric" autocomplete="off" placeholder="CVC" maxlength="4" value="${esc(p.card.cvc)}"></div>
+  <input class="f" id="cName" autocomplete="off" placeholder="${t('holder')}" value="${esc(p.card.name)}"><p class="mut">${t('testHint')}</p>`:'';
+ b.innerHTML=head+`<p class="mut">${t('demoBanner')}</p>`+items+un+`<div class="li"><b>${t('total')}</b><b style="font-size:18px">${money(o.total,o.cur)}</b></div>`
+  +M.map(([k,i,x])=>`<div class="pm${p.method===k?' sel':''}" data-m="${k}"><span>${i}</span><span>${x}</span></div>`).join('')+card
+  +(p.msg?`<p style="color:#d93025">${esc(p.msg)}</p>`:'')+`<button class="go" id="pGo">${t('payBtn')} ${money(o.total,o.cur)}</button><button class="go sec" id="pX">${t('cancel')}</button>`;
+ b.querySelectorAll('.pm').forEach(e=>e.onclick=()=>{p.method=e.dataset.m;p.msg='';renderPay()});
+ $('pX').onclick=closePay;$('pGo').onclick=doPay;
+ if(p.method==='card'){const bind=(id,k,fmt)=>{$(id).oninput=e=>{let v=e.target.value;if(fmt){v=fmt(v);e.target.value=v}p.card[k]=v};};
+  bind('cNum','num',v=>v.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim());bind('cExp','exp',v=>{v=v.replace(/\D/g,'').slice(0,4);return v.length>2?v.slice(0,2)+'/'+v.slice(2):v});
+  bind('cCvc','cvc',v=>v.replace(/\D/g,'').slice(0,4));bind('cName','name')}}
+async function doPay(){const p=pay,c=p.card;
+ if(p.method==='card'){const mm=+c.exp.slice(0,2);if(c.num.replace(/\D/g,'').length!==16||!/^\d\d\/\d\d$/.test(c.exp)||mm<1||mm>12||c.cvc.length<3){p.msg=t('badCard');return renderPay()}}
+ p.step='busy';renderPay();
+ try{p.res=await Payments.pay(p.order,p.method,{number:c.num});p.card={num:'',exp:'',cvc:'',name:''};p.step='ok'}
+ catch(e){p.step='err';p.msg=e.code==='insufficient'?t('insufficient'):e.code==='declined'?t('declinedMsg'):t('badCard')}
+ if(pay===p)renderPay()}
+function renderTickets(){const l=Payments.tickets.list();
+ $('body').innerHTML=`<div class="card"><div class="li"><span>👛 ${t('mWallet')} <span class="demo">DEMO</span></span><b>${money(Payments.wallet.get())}</b></div><button class="go sec" id="wTop">${t('topup')}</button></div>`
+  +(l.map(tkHtml).join('')||`<p class="mut">${t('noTickets')}</p>`)+(l.length?`<button class="go sec" id="tClr">${t('clearTickets')}</button>`:'');
+ $('wTop').onclick=()=>{Payments.wallet.topup(10);renderTickets()};const c=$('tClr');if(c)c.onclick=()=>{Payments.tickets.clear();renderTickets()}}
+init();
+</script></body></html>

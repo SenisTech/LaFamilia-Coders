@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="bg"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<title>Транспорт България</title>
+<style>
+:root{--bg:#0d0d0d;--fg:#f2f2f2;--mut:#8a8a8a;--line:#2e2e2e;--acc:#ffd400}
+*{box-sizing:border-box;border-radius:0}
+html{color-scheme:dark;background:var(--bg)}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--fg);font:16px/1.45 "Helvetica Neue",Arial,system-ui,sans-serif;
+ padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px;min-height:100dvh;display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--fg);padding:16px 0}
+.tag{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+#bg{display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--fg);font:inherit;font-size:14px;cursor:pointer;padding:6px 0}
+#bg i{display:block;width:18px;height:18px;border:2px solid var(--fg)}
+#bg[aria-checked=true] i{background:var(--acc);border-color:var(--acc)}
+#bg:focus-visible,.go:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+main{flex:1;padding:56px 0 40px}
+h1{font-size:clamp(40px,11vw,84px);line-height:.95;margin:0 0 24px;font-weight:900;letter-spacing:-.03em;text-transform:uppercase}
+.lead{max-width:460px;margin:0 0 32px;color:var(--mut);font-size:18px}
+.go{display:inline-block;background:var(--acc);color:#0d0d0d;text-decoration:none;font-weight:800;font-size:18px;letter-spacing:.06em;text-transform:uppercase;padding:18px 28px;border:2px solid var(--acc)}
+.go:hover{background:var(--bg);color:var(--acc)}
+ul{list-style:none;margin:56px 0 0;padding:0;border-top:2px solid var(--fg)}
+li{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+li b{width:30px;flex:none;color:var(--acc);font-variant-numeric:tabular-nums}
+li span{flex:1}li em{font-style:normal;color:var(--mut)}
+footer{border-top:1px solid var(--line);padding:16px 0 24px;color:var(--mut);font-size:13px}
+footer a{color:var(--fg)}
+</style></head><body>
+<div class="wrap">
+<header><span class="tag" data-k="tag"></span><button id="bg" role="switch" aria-checked="true"><i></i>Български</button></header>
+<main>
+ <h1 data-k="h1"></h1>
+ <p class="lead" data-k="lead"></p>
+ <a class="go" href="/intmap" data-k="cta"></a>
+ <ul>
+  <li><b>01</b><span data-k="l1"></span><em data-k="l1b"></em></li>
+  <li><b>02</b><span data-k="l2"></span><em data-k="l2b"></em></li>
+  <li><b>03</b><span data-k="l3"></span><em data-k="l3b"></em></li>
+  <li><b>04</b><span data-k="l4"></span><em data-k="l4b"></em></li>
+  <li><b>05</b><span data-k="l5"></span><em data-k="l5b"></em></li>
+ </ul>
+</main>
+<footer><span data-k="foot"></span> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></footer>
+</div>
+<script>
+const T={
+bg:{tag:'България',h1:'Транспорт България',lead:'Карта, маршрути и цени за градския транспорт и влаковете.',cta:'Отвори картата',
+ l1:'Линии',l1b:'градове и цялата страна',l2:'Маршрути',l2b:'по разписания',l3:'На живо',l3b:'засега само София',l4:'Цени',l4b:'с източник',l5:'Билети',l5b:'демо, нищо не се тегли',
+ foot:'Данни: публични GTFS файлове. Разписанията са седмични, празниците не са отчетени. Карта:'},
+en:{tag:'Bulgaria',h1:'Transport Bulgaria',lead:'Map, journey planner and fares for city transit and trains.',cta:'Open the map',
+ l1:'Lines',l1b:'cities and the whole country',l2:'Journeys',l2b:'from timetables',l3:'Live',l3b:'Sofia only for now',l4:'Fares',l4b:'with sources',l5:'Tickets',l5b:'demo, nothing is charged',
+ foot:'Data: public GTFS feeds. Timetables are weekly patterns, holidays not applied. Map:'}};
+const $=id=>document.getElementById(id);
+let lg='bg';try{lg=localStorage.getItem('lang')==='en'?'en':'bg'}catch(e){}   /* Bulgarian unless the visitor switched it off; the map reads the same setting */
+function apply(){const d=T[lg];document.documentElement.lang=lg;document.title=d.h1;
+ document.querySelectorAll('[data-k]').forEach(e=>e.textContent=d[e.dataset.k]);$('bg').setAttribute('aria-checked',lg==='bg')}
+$('bg').onclick=()=>{lg=lg==='bg'?'en':'bg';try{localStorage.setItem('lang',lg)}catch(e){}apply()};
+apply();
+</script>
+</body></html>

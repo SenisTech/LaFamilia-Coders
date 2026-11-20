@@ -1,0 +1,819 @@
+[
+ {
+  "id": "sofia",
+  "name": "София",
+  "center": [
+   42.6977,
+   23.3219
+  ],
+  "zoom": 12,
+  "url": "https://gtfs.sofiatraffic.bg/api/v1/static",
+  "realtime": "https://gtfs.sofiatraffic.bg/api/v1/vehicle-positions",
+  "match": [
+   "sofia",
+   "софия"
+  ]
+ },
+ {
+  "id": "plovdiv",
+  "name": "Пловдив",
+  "center": [
+   42.1354,
+   24.7453
+  ],
+  "zoom": 12,
+  "url": "https://trakia.tech/gtfs/plovdiv.zip",
+  "file": "feeds/plovdiv.zip",
+  "match": [
+   "plovdiv",
+   "пловдив"
+  ]
+ },
+ {
+  "id": "varna",
+  "name": "Варна",
+  "center": [
+   43.2141,
+   27.9147
+  ],
+  "zoom": 12,
+  "file": "feeds/varna.zip",
+  "match": [
+   "varna",
+   "варна"
+  ]
+ },
+ {
+  "id": "burgas",
+  "name": "Бургас",
+  "center": [
+   42.5048,
+   27.4626
+  ],
+  "zoom": 12,
+  "file": "feeds/burgas.zip",
+  "match": [
+   "burgas",
+   "бургас"
+  ]
+ },
+ {
+  "id": "stara-zagora",
+  "name": "Стара Загора",
+  "center": [
+   42.4258,
+   25.6345
+  ],
+  "zoom": 13,
+  "file": "feeds/stara-zagora.zip",
+  "match": [
+   "stara zagora",
+   "стара загора"
+  ]
+ },
+ {
+  "id": "veliko-tarnovo",
+  "name": "Велико Търново",
+  "center": [
+   43.0757,
+   25.6172
+  ],
+  "zoom": 13,
+  "file": "feeds/veliko-tarnovo.zip",
+  "match": [
+   "veliko tarnovo",
+   "велико търново"
+  ]
+ },
+ {
+  "id": "dobrich",
+  "name": "Добрич",
+  "center": [
+   43.5726,
+   27.8273
+  ],
+  "zoom": 13,
+  "file": "feeds/dobrich.zip",
+  "match": [
+   "dobrich",
+   "добрич"
+  ]
+ },
+ {
+  "id": "sliven",
+  "name": "Сливен",
+  "center": [
+   42.6816,
+   26.3229
+  ],
+  "zoom": 13,
+  "file": "feeds/sliven.zip",
+  "match": [
+   "sliven",
+   "сливен"
+  ]
+ },
+ {
+  "id": "yambol",
+  "name": "Ямбол",
+  "center": [
+   42.4842,
+   26.5035
+  ],
+  "zoom": 13,
+  "file": "feeds/yambol.zip",
+  "match": [
+   "yambol",
+   "ямбол"
+  ]
+ },
+ {
+  "id": "kazanlak",
+  "name": "Казанлък",
+  "center": [
+   42.6194,
+   25.393
+  ],
+  "zoom": 13,
+  "file": "feeds/kazanlak.zip",
+  "match": [
+   "kazanlak",
+   "казанлък"
+  ]
+ },
+ {
+  "id": "samokov",
+  "name": "Самоков",
+  "center": [
+   42.3372,
+   23.5528
+  ],
+  "zoom": 13,
+  "file": "feeds/samokov.zip",
+  "match": [
+   "samokov",
+   "самоков"
+  ]
+ },
+ {
+  "id": "ruse",
+  "name": "Русе",
+  "center": [
+   43.8564,
+   25.9708
+  ],
+  "zoom": 13,
+  "file": "feeds/ruse.zip",
+  "match": [
+   "ruse",
+   "русе"
+  ]
+ },
+ {
+  "id": "pleven",
+  "name": "Плевен",
+  "center": [
+   43.417,
+   24.6067
+  ],
+  "zoom": 13,
+  "file": "feeds/pleven.zip",
+  "match": [
+   "pleven",
+   "плевен"
+  ]
+ },
+ {
+  "id": "blagoevgrad",
+  "name": "Благоевград",
+  "center": [
+   42.0209,
+   23.0943
+  ],
+  "zoom": 13,
+  "file": "feeds/blagoevgrad.zip",
+  "match": [
+   "blagoevgrad",
+   "благоевград"
+  ]
+ },
+ {
+  "id": "shumen",
+  "name": "Шумен",
+  "center": [
+   43.2712,
+   26.9361
+  ],
+  "zoom": 13,
+  "file": "feeds/shumen.zip",
+  "match": [
+   "shumen",
+   "шумен"
+  ]
+ },
+ {
+  "id": "pernik",
+  "name": "Перник",
+  "center": [
+   42.6052,
+   23.0378
+  ],
+  "zoom": 13,
+  "file": "feeds/pernik.zip",
+  "match": [
+   "pernik",
+   "перник"
+  ]
+ },
+ {
+  "id": "haskovo",
+  "name": "Хасково",
+  "center": [
+   41.9344,
+   25.5554
+  ],
+  "zoom": 13,
+  "file": "feeds/haskovo.zip",
+  "match": [
+   "haskovo",
+   "хасково"
+  ]
+ },
+ {
+  "id": "gabrovo",
+  "name": "Габрово",
+  "center": [
+   42.8742,
+   25.3187
+  ],
+  "zoom": 13,
+  "file": "feeds/gabrovo.zip",
+  "match": [
+   "gabrovo",
+   "габрово"
+  ]
+ },
+ {
+  "id": "pazardzhik",
+  "name": "Пазарджик",
+  "center": [
+   42.1928,
+   24.3336
+  ],
+  "zoom": 13,
+  "file": "feeds/pazardzhik.zip",
+  "match": [
+   "pazardzhik",
+   "пазарджик"
+  ]
+ },
+ {
+  "id": "vratsa",
+  "name": "Враца",
+  "center": [
+   43.2102,
+   23.5529
+  ],
+  "zoom": 13,
+  "file": "feeds/vratsa.zip",
+  "match": [
+   "vratsa",
+   "враца"
+  ]
+ },
+ {
+  "id": "montana",
+  "name": "Монтана",
+  "center": [
+   43.4085,
+   23.2257
+  ],
+  "zoom": 13,
+  "file": "feeds/montana.zip",
+  "match": [
+   "montana",
+   "монтана"
+  ]
+ },
+ {
+  "id": "vidin",
+  "name": "Видин",
+  "center": [
+   43.99,
+   22.8725
+  ],
+  "zoom": 13,
+  "file": "feeds/vidin.zip",
+  "match": [
+   "vidin",
+   "видин"
+  ]
+ },
+ {
+  "id": "lovech",
+  "name": "Ловеч",
+  "center": [
+   43.137,
+   24.7139
+  ],
+  "zoom": 13,
+  "file": "feeds/lovech.zip",
+  "match": [
+   "lovech",
+   "ловеч"
+  ]
+ },
+ {
+  "id": "targovishte",
+  "name": "Търговище",
+  "center": [
+   43.2512,
+   26.5692
+  ],
+  "zoom": 13,
+  "file": "feeds/targovishte.zip",
+  "match": [
+   "targovishte",
+   "търговище"
+  ]
+ },
+ {
+  "id": "razgrad",
+  "name": "Разград",
+  "center": [
+   43.5256,
+   26.5241
+  ],
+  "zoom": 13,
+  "file": "feeds/razgrad.zip",
+  "match": [
+   "razgrad",
+   "разград"
+  ]
+ },
+ {
+  "id": "silistra",
+  "name": "Силистра",
+  "center": [
+   44.117,
+   27.2606
+  ],
+  "zoom": 13,
+  "file": "feeds/silistra.zip",
+  "match": [
+   "silistra",
+   "силистра"
+  ]
+ },
+ {
+  "id": "smolyan",
+  "name": "Смолян",
+  "center": [
+   41.5774,
+   24.7011
+  ],
+  "zoom": 13,
+  "file": "feeds/smolyan.zip",
+  "match": [
+   "smolyan",
+   "смолян"
+  ]
+ },
+ {
+  "id": "kardzhali",
+  "name": "Кърджали",
+  "center": [
+   41.6338,
+   25.3777
+  ],
+  "zoom": 13,
+  "file": "feeds/kardzhali.zip",
+  "match": [
+   "kardzhali",
+   "кърджали"
+  ]
+ },
+ {
+  "id": "sandanski",
+  "name": "Сандански",
+  "center": [
+   41.5666,
+   23.2817
+  ],
+  "zoom": 13,
+  "file": "feeds/sandanski.zip",
+  "match": [
+   "sandanski",
+   "сандански"
+  ]
+ },
+ {
+  "id": "dupnitsa",
+  "name": "Дупница",
+  "center": [
+   42.2661,
+   23.117
+  ],
+  "zoom": 13,
+  "file": "feeds/dupnitsa.zip",
+  "match": [
+   "dupnitsa",
+   "дупница"
+  ]
+ },
+ {
+  "id": "kyustendil",
+  "name": "Кюстендил",
+  "center": [
+   42.2839,
+   22.6911
+  ],
+  "zoom": 13,
+  "file": "feeds/kyustendil.zip",
+  "match": [
+   "kyustendil",
+   "кюстендил"
+  ]
+ },
+ {
+  "id": "asenovgrad",
+  "name": "Асеновград",
+  "center": [
+   42.0167,
+   24.8667
+  ],
+  "zoom": 13,
+  "file": "feeds/asenovgrad.zip",
+  "match": [
+   "asenovgrad",
+   "асеновград"
+  ]
+ },
+ {
+  "id": "dimitrovgrad",
+  "name": "Димитровград",
+  "center": [
+   42.05,
+   25.6
+  ],
+  "zoom": 13,
+  "file": "feeds/dimitrovgrad.zip",
+  "match": [
+   "dimitrovgrad",
+   "димитровград"
+  ]
+ },
+ {
+  "id": "svishtov",
+  "name": "Свищов",
+  "center": [
+   43.6183,
+   25.35
+  ],
+  "zoom": 13,
+  "file": "feeds/svishtov.zip",
+  "match": [
+   "svishtov",
+   "свищов"
+  ]
+ },
+ {
+  "id": "gorna-oryahovitsa",
+  "name": "Горна Оряховица",
+  "center": [
+   43.1267,
+   25.6983
+  ],
+  "zoom": 13,
+  "file": "feeds/gorna-oryahovitsa.zip",
+  "match": [
+   "gorna oryahovitsa",
+   "горна оряховица"
+  ]
+ },
+ {
+  "id": "sevlievo",
+  "name": "Севлиево",
+  "center": [
+   43.0258,
+   25.1017
+  ],
+  "zoom": 13,
+  "file": "feeds/sevlievo.zip",
+  "match": [
+   "sevlievo",
+   "севлиево"
+  ]
+ },
+ {
+  "id": "nesebar",
+  "name": "Несебър",
+  "center": [
+   42.6597,
+   27.7356
+  ],
+  "zoom": 13,
+  "file": "feeds/nesebar.zip",
+  "match": [
+   "nesebar",
+   "несебър"
+  ]
+ },
+ {
+  "id": "sozopol",
+  "name": "Созопол",
+  "center": [
+   42.4167,
+   27.6958
+  ],
+  "zoom": 13,
+  "file": "feeds/sozopol.zip",
+  "match": [
+   "sozopol",
+   "созопол"
+  ]
+ },
+ {
+  "id": "pomorie",
+  "name": "Поморие",
+  "center": [
+   42.55,
+   27.6333
+  ],
+  "zoom": 13,
+  "file": "feeds/pomorie.zip",
+  "match": [
+   "pomorie",
+   "поморие"
+  ]
+ },
+ {
+  "id": "botevgrad",
+  "name": "Ботевград",
+  "center": [
+   42.9,
+   23.7833
+  ],
+  "zoom": 13,
+  "file": "feeds/botevgrad.zip",
+  "match": [
+   "botevgrad",
+   "ботевград"
+  ]
+ },
+ {
+  "id": "bansko",
+  "name": "Банско",
+  "center": [
+   41.8383,
+   23.4886
+  ],
+  "zoom": 13,
+  "file": "feeds/bansko.zip",
+  "match": [
+   "bansko",
+   "банско"
+  ]
+ },
+ {
+  "id": "velingrad",
+  "name": "Велинград",
+  "center": [
+   42.0275,
+   23.9917
+  ],
+  "zoom": 13,
+  "file": "feeds/velingrad.zip",
+  "match": [
+   "velingrad",
+   "велинград"
+  ]
+ },
+ {
+  "id": "troyan",
+  "name": "Троян",
+  "center": [
+   42.8939,
+   24.7106
+  ],
+  "zoom": 13,
+  "file": "feeds/troyan.zip",
+  "match": [
+   "troyan",
+   "троян"
+  ]
+ },
+ {
+  "id": "karlovo",
+  "name": "Карлово",
+  "center": [
+   42.6372,
+   24.8067
+  ],
+  "zoom": 13,
+  "file": "feeds/karlovo.zip",
+  "match": [
+   "karlovo",
+   "карлово"
+  ]
+ },
+ {
+  "id": "petrich",
+  "name": "Петрич",
+  "center": [
+   41.3978,
+   23.2086
+  ],
+  "zoom": 13,
+  "file": "feeds/petrich.zip",
+  "match": [
+   "petrich",
+   "петрич"
+  ]
+ },
+ {
+  "id": "berkovitsa",
+  "name": "Берковица",
+  "center": [
+   43.2333,
+   23.1167
+  ],
+  "zoom": 13,
+  "file": "feeds/berkovitsa.zip",
+  "match": [
+   "berkovitsa",
+   "берковица"
+  ]
+ },
+ {
+  "id": "chirpan",
+  "name": "Чирпан",
+  "center": [
+   42.2,
+   25.3333
+  ],
+  "zoom": 13,
+  "file": "feeds/chirpan.zip",
+  "match": [
+   "chirpan",
+   "чирпан"
+  ]
+ },
+ {
+  "id": "nova-zagora",
+  "name": "Нова Загора",
+  "center": [
+   42.4833,
+   26.0167
+  ],
+  "zoom": 13,
+  "file": "feeds/nova-zagora.zip",
+  "match": [
+   "nova zagora",
+   "нова загора"
+  ]
+ },
+ {
+  "id": "popovo",
+  "name": "Попово",
+  "center": [
+   43.35,
+   26.2333
+  ],
+  "zoom": 13,
+  "file": "feeds/popovo.zip",
+  "match": [
+   "popovo",
+   "попово"
+  ]
+ },
+ {
+  "id": "karnobat",
+  "name": "Карнобат",
+  "center": [
+   42.65,
+   26.9833
+  ],
+  "zoom": 13,
+  "file": "feeds/karnobat.zip",
+  "match": [
+   "karnobat",
+   "карнобат"
+  ]
+ },
+ {
+  "id": "provadia",
+  "name": "Провадия",
+  "center": [
+   43.1833,
+   27.4333
+  ],
+  "zoom": 13,
+  "file": "feeds/provadia.zip",
+  "match": [
+   "provadia",
+   "провадия"
+  ]
+ },
+ {
+  "id": "panagyurishte",
+  "name": "Панагюрище",
+  "center": [
+   42.4958,
+   24.1833
+  ],
+  "zoom": 13,
+  "file": "feeds/panagyurishte.zip",
+  "match": [
+   "panagyurishte",
+   "панагюрище"
+  ]
+ },
+ {
+  "id": "ihtiman",
+  "name": "Ихтиман",
+  "center": [
+   42.4333,
+   23.8167
+  ],
+  "zoom": 13,
+  "file": "feeds/ihtiman.zip",
+  "match": [
+   "ihtiman",
+   "ихтиман"
+  ]
+ },
+ {
+  "id": "gotse-delchev",
+  "name": "Гоце Делчев",
+  "center": [
+   41.5667,
+   23.7333
+  ],
+  "zoom": 13,
+  "file": "feeds/gotse-delchev.zip",
+  "match": [
+   "gotse delchev",
+   "гоце делчев"
+  ]
+ },
+ {
+  "id": "harmanli",
+  "name": "Харманли",
+  "center": [
+   41.9333,
+   25.9
+  ],
+  "zoom": 13,
+  "file": "feeds/harmanli.zip",
+  "match": [
+   "harmanli",
+   "харманли"
+  ]
+ },
+ {
+  "id": "svilengrad",
+  "name": "Свиленград",
+  "center": [
+   41.7667,
+   26.2
+  ],
+  "zoom": 13,
+  "file": "feeds/svilengrad.zip",
+  "match": [
+   "svilengrad",
+   "свиленград"
+  ]
+ },
+ {
+  "id": "kozloduy",
+  "name": "Козлодуй",
+  "center": [
+   43.7833,
+   23.7
+  ],
+  "zoom": 13,
+  "file": "feeds/kozloduy.zip",
+  "match": [
+   "kozloduy",
+   "козлодуй"
+  ]
+ },
+ {
+  "id": "bdz",
+  "name": "Влакове (БДЖ)",
+  "kind": "rail",
+  "center": [
+   42.75,
+   25.3
+  ],
+  "zoom": 7,
+  "file": "feeds/bdz.zip",
+  "match": [
+   "bdz",
+   "bulgarian passenger railway",
+   "bulgarian state railways",
+   "бдж"
+  ]
+ }
+]

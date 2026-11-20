@@ -1,0 +1,28 @@
+{
+ "_readme": "Fares per dataset id (same ids as cities.json). A dataset with no entry shows 'no info' in the app. ride = single-ride price; cap = max total per day; metroOneTicket = changing between metro lines needs no new ticket. Only add numbers you can link a source for.",
+ "sofia": {
+  "cur": "EUR", "ride": 0.80, "cap": 2.00, "metroOneTicket": true,
+  "note": "Single ticket since 1 Jan 2026. Daily cap applies from the 3rd trip of a day.",
+  "sources": [
+   {"t": "Sofia Metro - tickets valid from 01.01.2026", "u": "https://www.metropolitan.bg/en/information-for-citizens/trip-cards-sofia-metro"},
+   {"t": "BTA - single ticket EUR 0.80", "u": "https://www.bta.bg/en/news/1032102-sofia-ready-for-the-euro-no-price-hikes-mayor-terziev-says"},
+   {"t": "Sofia University - daily cap EUR 2 after 3 trips", "u": "https://erasmus.uni-sofia.bg/site/income/practical-information-2/local-transportation/"},
+   {"t": "Sofia Metro - one metro ticket, unlimited metro changes", "u": "https://metrosofia.com/en/tickets"}
+  ]
+ },
+ "plovdiv": {
+  "cur": "EUR", "ride": 0.50,
+  "note": "City bus single ticket, EUR 0.50 since 1 Feb 2026 as reported by media.",
+  "sources": [
+   {"t": "Novinite - EUR 0.50 from 1 February 2026", "u": "https://m.novinite.com/view_news.php?id=236095"},
+   {"t": "BNT - current city ticket price EUR 0.50", "u": "https://bntnews.bg/news/bus-fares-from-plovdiv-to-sofia-rise-by-25-amid-fuel-price-surge-1385320news.html"}
+  ]
+ },
+ "burgas": {
+  "cur": "EUR", "ride": 0.80,
+  "note": "Reported at the start of 2026 (disputed increase) - may have changed since.",
+  "sources": [
+   {"t": "Novinite - Burgas single ticket 80 euro cents", "u": "https://www.novinite.com/articles/236219/Controversy+Over+Burgas+Bus+Fares%3A+Company+Says+Increase+Approved%2C+NRA+Flags+4+Rise"}
+  ]
+ }
+}
